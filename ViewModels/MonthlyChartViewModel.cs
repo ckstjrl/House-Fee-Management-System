@@ -46,23 +46,34 @@ namespace ManagementHouseFee.ViewModels
 
         private void LoadChartData()
         {
-            // 1. 선택된 연도의 데이터만 필터링
+            // 1. 선택된 연도의 데이터 필터링
             var targetRecords = _allRecords.Where(r => r.Year == SelectedYear).ToList();
 
-            // 2. 모든 항목 이름 찾기
+            // 2. X축 라벨 생성 (월 + 해당 월 총액)
+            var labelsWithTotals = new List<string>();
+            for (int m = 1; m <= 12; m++)
+            {
+                var record = targetRecords.FirstOrDefault(r => r.Month == m);
+                double monthTotal = record?.TotalAmount ?? 0;
+                
+                // 해당 월 밑에 총액 표시
+                labelsWithTotals.Add($"{m}월\n({monthTotal:N0}원)");
+            }
+            Labels = labelsWithTotals.ToArray();
+
+            // 3. 모든 항목 이름 찾기
             var allItemNames = _allRecords.SelectMany(r => r.Items)
-                                          .Select(i => i.Name)
-                                          .Distinct()
-                                          .ToList();
+                                        .Select(i => i.Name)
+                                        .Distinct()
+                                        .ToList();
 
             var seriesCollection = new SeriesCollection();
 
-            // 3. 항목별로 루프 (전기세, 수도세...)
+            // 항목별 루프 및 시리즈 생성 (기존 로직 유지)
             foreach (var itemName in allItemNames)
             {
                 var values = new ChartValues<double>();
 
-                // 1월부터 12월까지 루프
                 for (int month = 1; month <= 12; month++)
                 {
                     var record = targetRecords.FirstOrDefault(r => r.Month == month);
@@ -73,7 +84,7 @@ namespace ManagementHouseFee.ViewModels
                     }
                     else
                     {
-                        values.Add(0); // 데이터 없는 달은 0
+                        values.Add(0);
                     }
                 }
 
@@ -81,7 +92,7 @@ namespace ManagementHouseFee.ViewModels
                 {
                     Title = itemName,
                     Values = values,
-                    DataLabels = false // 막대그래프에 숫자 표시 X
+                    DataLabels = false
                 });
             }
 

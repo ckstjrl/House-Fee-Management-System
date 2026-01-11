@@ -33,35 +33,42 @@ namespace ManagementHouseFee.ViewModels
         {
             // 1. 데이터가 존재하는 모든 연도 찾기 (오름차순)
             var years = _allRecords.Select(r => r.Year).Distinct().OrderBy(y => y).ToList();
-            Labels = years.Select(y => y.ToString()).ToArray();
 
-            // 2. 모든 항목 이름 찾기 (전기세, 수도세 등 중복 제거)
-            // (데이터에 한 번이라도 등장한 적 있는 항목 이름들을 다 모읍니다)
+            // 2. X축 라벨 생성 (연도 + 연 평균 총액)
+            var labelsWithTotals = new List<string>();
+            foreach (var year in years)
+            {
+                var recordsInYear = _allRecords.Where(r => r.Year == year).ToList();
+                
+                // 해당 연도의 월 평균 총액 계산
+                double avgTotal = recordsInYear.Any() ? recordsInYear.Average(r => r.TotalAmount) : 0;
+                
+                // \n을 사용하여 연도 밑에 금액이 나오도록 구성
+                labelsWithTotals.Add($"{year}년\n({avgTotal:N0}원)");
+            }
+            Labels = labelsWithTotals.ToArray();
+
+            // 3. 모든 항목 이름 찾기
             var allItemNames = _allRecords.SelectMany(r => r.Items)
-                                          .Select(i => i.Name)
-                                          .Distinct()
-                                          .ToList();
+                                        .Select(i => i.Name)
+                                        .Distinct()
+                                        .ToList();
 
-            // 3. 차트 시리즈 생성 (항목별로 Series를 만듦)
             var seriesCollection = new SeriesCollection();
 
+            // 항목별 루프 및 시리즈 생성 (기존 로직 유지)
             foreach (var itemName in allItemNames)
             {
                 var values = new ChartValues<double>();
 
                 foreach (var year in years)
                 {
-                    // 해당 연도의 모든 기록 가져오기
                     var recordsInYear = _allRecords.Where(r => r.Year == year).ToList();
-
                     if (recordsInYear.Any())
                     {
-                        // 해당 연도, 해당 항목의 총합 계산
                         double sum = recordsInYear.SelectMany(r => r.Items)
-                                                  .Where(i => i.Name == itemName)
-                                                  .Sum(i => i.Amount);
-
-                        // 월 평균 계산 (총합 / 기록된 개월 수)
+                                                .Where(i => i.Name == itemName)
+                                                .Sum(i => i.Amount);
                         double avg = sum / recordsInYear.Count;
                         values.Add(avg);
                     }
@@ -71,14 +78,12 @@ namespace ManagementHouseFee.ViewModels
                     }
                 }
 
-                // 스택(Stacked) 막대 그래프 추가
                 seriesCollection.Add(new StackedColumnSeries
                 {
-                    Title = itemName, // 범례 이름 (전기세 등)
+                    Title = itemName,
                     Values = values,
-                    DataLabels = false, // 막대 위에 숫자 표시X
-
-                    LabelPoint = point => $"{point.Y:NO} ({point.Participation:P1})"
+                    DataLabels = false,
+                    LabelPoint = point => $"{point.Y:N0}원 ({point.Participation:P1})"
                 });
             }
 
