@@ -78,7 +78,7 @@ namespace ManagementHouseFee.ViewModels
                 }
             }
             PieSeries = series;
-            
+
             // 계산된 합계를 문자열로 변환하여 속성에 저장
             TotalAmountText = $"총액 : {total:N0}원";
         }
@@ -108,6 +108,46 @@ namespace ManagementHouseFee.ViewModels
             var window = new ItemManagerWindow();
             window.ShowDialog();
             RefreshItems();
+        }
+
+        // 1. 연도가 변경될 때 호출
+        partial void OnSelectedYearChanged(int value) => LoadRecordForSelectedDate();
+
+        // 2. 월이 변경될 때 호출
+        partial void OnSelectedMonthChanged(int value) => LoadRecordForSelectedDate();
+
+        // 3. 날짜에 맞는 데이터를 로드하거나 초기화하는 핵심 로직
+        private void LoadRecordForSelectedDate()
+        {
+            // 전체 데이터를 다시 로드
+            var allRecords = _dataService.Load();
+
+            // 현재 선택된 연/월에 해당하는 기록 찾기
+            var existingRecord = allRecords.FirstOrDefault(r => r.Year == SelectedYear && r.Month == SelectedMonth);
+
+            if (existingRecord != null)
+            {
+                // [케이스 1] 저장된 내역이 있는 경우: 저장된 금액으로 채우기
+                var loadedItems = new ObservableCollection<FeeInputWrapper>();
+
+                // 기준이 되는 항목 리스트를 가져와서 저장된 값이 있는지 매칭
+                var itemNames = _dataService.LoadItems();
+                foreach (var name in itemNames)
+                {
+                    var savedItem = existingRecord.Items.FirstOrDefault(i => i.Name == name);
+                    double amount = savedItem?.Amount ?? 0; // 저장된 게 없으면 0
+                    loadedItems.Add(new FeeInputWrapper(name, amount, UpdateChart));
+                }
+                InputItems = loadedItems;
+            }
+            else
+            {
+                // [케이스 2] 저장된 내역이 없는 경우: 모두 0으로 초기화
+                RefreshItems();
+            }
+
+            // 차트와 총액 텍스트 갱신
+            UpdateChart();
         }
     }
 }
