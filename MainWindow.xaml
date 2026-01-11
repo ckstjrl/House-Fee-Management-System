@@ -35,6 +35,7 @@
 
                 <Button Content="메인" Command="{Binding NavigateCommand}" CommandParameter="Main"/>
                 <Button Content="내역 추가" Command="{Binding NavigateCommand}" CommandParameter="Add"/>
+                <Button Content="관리비 내역" Command="{Binding NavigateCommand}"  CommandParameter="History"/>
                 <Button Content="연도별 비교" Command="{Binding NavigateCommand}" CommandParameter="Yearly"/>
                 <Button Content="월별 비교" Command="{Binding NavigateCommand}" CommandParameter="Monthly"/>
                 <Button Content="항목별 비교" Command="{Binding NavigateCommand}" CommandParameter="Item"/>
