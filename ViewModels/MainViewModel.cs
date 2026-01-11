@@ -43,6 +43,11 @@ namespace ManagementHouseFee.ViewModels
                     var addVm = new AddRecordViewModel();
                     CurrentView = new AddRecordView { DataContext = addVm };
                     break;
+
+                case "History":
+                    CurrentView = new HistoryView { DataContext = new HistoryViewModel() };
+                    break;
+
                 case "Yearly":
                     CurrentView = new YearlyChartView();
                     break;

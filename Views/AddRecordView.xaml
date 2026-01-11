@@ -62,11 +62,7 @@
             </ScrollViewer>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                <Button Content="⚙ 항목 관리" 
-                        Command="{Binding ManageItemsCommand}" 
-                        Width="100" Height="40" 
-                        Background="Gray" Foreground="White" 
-                        Margin="0,0,10,0"/>
+                <Button Content="⚙ 항목 관리" Command="{Binding ManageItemsCommand}" Width="100" Height="40" Background="Gray" Foreground="White" Margin="0,0,10,0"/>
                 <Button Content="💾 저장하기" Command="{Binding SaveCommand}" Width="120" Height="40" Background="#007ACC" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
@@ -78,7 +74,10 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="실시간 비율 분석" FontSize="18" FontWeight="Bold" Foreground="#555" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <TextBlock Text="실시간 비율 분석" FontSize="18" FontWeight="Bold" Foreground="#555" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding TotalAmountText}" FontSize="18" FontWeight="Bold" Foreground="#007ACC" HorizontalAlignment="Right"/>
+                </Grid>
 
                 <lvc:PieChart Grid.Row="1" Series="{Binding PieSeries}" LegendLocation="Bottom" InnerRadius="50">
                     <lvc:PieChart.ChartLegend>
