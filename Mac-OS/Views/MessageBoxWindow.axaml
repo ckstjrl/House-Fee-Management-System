@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ManagementHouseFee_Avalonia.Views.MessageBoxWindow"
+        Title="알림"
+        Width="300" Height="150"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        SystemDecorations="BorderOnly"
+        Background="White">
+    
+    <Border BorderBrush="Gray" BorderThickness="1">
+        <Grid RowDefinitions="*,Auto" Margin="20">
+            <TextBlock x:Name="MessageText" 
+                       Grid.Row="0"
+                       Text="내용" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Center" 
+                       TextWrapping="Wrap"
+                       FontSize="14"/>
+            
+            <Button Grid.Row="1" 
+                    Content="확인" 
+                    HorizontalAlignment="Center" 
+                    Width="80"
+                    HorizontalContentAlignment="Center"
+                    Click="Button_Click"/>
+        </Grid>
+    </Border>
+</Window>
