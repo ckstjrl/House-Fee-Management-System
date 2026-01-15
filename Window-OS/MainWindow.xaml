@@ -1,0 +1,47 @@
+﻿<Window x:Class="ManagementHouseFee.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:ManagementHouseFee.ViewModels"
+        mc:Ignorable="d"
+        Title="관리비 매니저" Height="600" Width="1000">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#333333">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="Margin" Value="10,0"/>
+                        <Setter Property="Padding" Value="10,5"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <TextBlock Text="🏠 MyHome" Foreground="White" FontWeight="Bold" FontSize="20" VerticalAlignment="Center" Margin="20,0,30,0"/>
+
+                <Button Content="메인" Command="{Binding NavigateCommand}" CommandParameter="Main"/>
+                <Button Content="내역 추가" Command="{Binding NavigateCommand}" CommandParameter="Add"/>
+                <Button Content="관리비 내역" Command="{Binding NavigateCommand}"  CommandParameter="History"/>
+                <Button Content="연도별 비교" Command="{Binding NavigateCommand}" CommandParameter="Yearly"/>
+                <Button Content="월별 비교" Command="{Binding NavigateCommand}" CommandParameter="Monthly"/>
+                <Button Content="항목별 비교" Command="{Binding NavigateCommand}" CommandParameter="Item"/>
+            </StackPanel>
+        </Border>
+
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}" Margin="20"/>
+    </Grid>
+</Window>
