@@ -16,9 +16,10 @@ namespace ManagementHouseFee.ViewModels
     public partial class AddRecordViewModel : ObservableObject
     {
         private readonly DataService _dataService;
+        private readonly DateTime _maxAvailableDate = DateTime.Now.AddMonths(-1);
 
-        public List<int> Years { get; } = new List<int>();
-        public List<int> Months { get; } = Enumerable.Range(1, 12).ToList();
+        public ObservableCollection<int> Years { get; } = new ObservableCollection<int>();
+        public ObservableCollection<int> Months { get; } = new ObservableCollection<int>();
 
         [ObservableProperty] private int _selectedYear;
         [ObservableProperty] private int _selectedMonth;
@@ -29,14 +30,58 @@ namespace ManagementHouseFee.ViewModels
         // 실시간 총액을 화면에 바인딩하기 위한 속성
         [ObservableProperty] private string _totalAmountText;
 
+
+        // 선택된 연도에 따라 가능한 월 목록을 계산하는 함수
+        private void UpdateAvailableMonths()
+        {
+            Months.Clear();
+
+            int maxMonth;
+
+            // 선택한 연도가 '작성 가능 최대 연도'와 같다면?
+            if (SelectedYear == _maxAvailableDate.Year)
+            {
+                // 그 해의 '작성 가능 최대 월'까지만 표시
+                maxMonth = _maxAvailableDate.Month;
+            }
+            else
+            {
+                // 과거 연도라면 1월부터 12월까지 모두 표시
+                maxMonth = 12;
+            }
+
+            // 월 목록 채우기
+            for (int i = 1; i <= maxMonth; i++)
+            {
+                Months.Add(i);
+            }
+
+            // 만약 현재 선택된 월이 새로 바뀐 범위보다 크다면, 강제로 최대월로 맞춤
+            // (예: 12월을 보다가 올해로 바꿨는데 올해는 5월까지만 입력 가능한 경우)
+            if (SelectedMonth > maxMonth)
+            {
+                SelectedMonth = maxMonth;
+            }
+        }
+
         public AddRecordViewModel()
         {
             _dataService = new DataService();
 
-            var now = DateTime.Now;
-            for (int i = now.Year - 5; i <= now.Year + 1; i++) Years.Add(i);
-            SelectedYear = now.Year;
-            SelectedMonth = now.Month;
+            Years.Clear();
+            for (int i = _maxAvailableDate.Year - 5; i <= _maxAvailableDate.Year; i++)
+            {
+                Years.Add(i);
+            }
+
+            // 초기 선택값: 가장 최근 작성 가능 연도
+            SelectedYear = _maxAvailableDate.Year;
+
+            // [추가] 연도에 맞춰 월 목록 갱신 (아래에 새로 만든 함수 호출)
+            UpdateAvailableMonths();
+
+            // 초기 선택값: 가장 최근 작성 가능 월
+            SelectedMonth = _maxAvailableDate.Month;
 
             RefreshItems();
         }
@@ -110,13 +155,21 @@ namespace ManagementHouseFee.ViewModels
             RefreshItems();
         }
 
-        // 1. 연도가 변경될 때 호출
-        partial void OnSelectedYearChanged(int value) => LoadRecordForSelectedDate();
+        // 연도가 변경될 때: 월 목록을 갱신하고 데이터를 로드
+        partial void OnSelectedYearChanged(int value)
+        {
+            UpdateAvailableMonths(); // 이 함수가 먼저 실행되어야 함
+            LoadRecordForSelectedDate();
+        }
 
-        // 2. 월이 변경될 때 호출
-        partial void OnSelectedMonthChanged(int value) => LoadRecordForSelectedDate();
+        // 월이 변경될 때: 0이 들어오는 경우 예외 처리 추가
+        partial void OnSelectedMonthChanged(int value)
+        {
+            if (value == 0) return; // 월 목록 갱신 중 발생하는 0 값 무시
+            LoadRecordForSelectedDate();
+        }
 
-        // 3. 날짜에 맞는 데이터를 로드하거나 초기화하는 핵심 로직
+        // 날짜에 맞는 데이터를 로드하거나 초기화하는 핵심 로직
         private void LoadRecordForSelectedDate()
         {
             // 전체 데이터를 다시 로드
