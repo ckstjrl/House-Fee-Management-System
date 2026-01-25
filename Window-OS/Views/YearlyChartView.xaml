@@ -22,15 +22,21 @@
         <TextBlock Text="📅 연도별 월평균 관리비 비교" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" Foreground="#333"/>
 
         <lvc:CartesianChart Grid.Row="1" Series="{Binding SeriesCollection}" LegendLocation="Right">
+
             <lvc:CartesianChart.AxisX>
-                <lvc:Axis Title="연도" Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"/>
+                <lvc:Axis Labels="{Binding Labels}">
+                    <lvc:Axis.Separator>
+                        <lvc:Separator Step="1" StrokeThickness="0"/>
+                    </lvc:Axis.Separator>
+                </lvc:Axis>
             </lvc:CartesianChart.AxisX>
+
             <lvc:CartesianChart.AxisY>
                 <lvc:Axis Title="평균 금액 (원)" LabelFormatter="{Binding Formatter}"/>
             </lvc:CartesianChart.AxisY>
 
             <lvc:CartesianChart.DataTooltip>
-                <local:CustomTooltipView SelectionMode="SharedYValues"/>
+                <local:CustomTooltipView SelectionMode="OnlySender"/>
             </lvc:CartesianChart.DataTooltip>
 
         </lvc:CartesianChart>

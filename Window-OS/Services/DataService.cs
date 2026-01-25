@@ -6,48 +6,62 @@ using System.Runtime.Serialization.Json;
 
 namespace ManagementHouseFee.Services
 {
+    /// <summary>
+    /// 관리비 데이터 및 사용자 정의 항목 리스트를 JSON 파일로 관리하는 서비스 클래스입니다.
+    /// </summary>
     public class DataService
     {
-        // 파일이 저장될 경로 (실행 파일과 같은 폴더의 fee_data.json)
-        private readonly string _filePath; 
+        private readonly string _filePath;      // 관리비 내역 JSON 경로
+        private readonly string _itemsFilePath; // 항목 리스트 JSON 경로
 
-        public DataService()// 실행 파일 경로에 'fee_data.json'으로 저장 경로 설정
+        public DataService()
         {
+            // 실행 파일(.exe)이 있는 폴더 경로를 가져옵니다.
             string folder = AppDomain.CurrentDomain.BaseDirectory;
+
+            // 각 데이터를 별도의 JSON 파일로 관리합니다.
             _filePath = Path.Combine(folder, "fee_data.json");
+            _itemsFilePath = Path.Combine(folder, "items.json");
         }
 
-        // 데이터 저장 (직렬화)
+        #region [관리비 내역 저장/로드]
+
+        /// <summary>
+        /// 월별 관리비 기록 리스트를 JSON 파일로 저장합니다.
+        /// </summary>
         public void Save(List<FeeRecord> records)
         {
-            // List<FeeRecord> 타입을 처리하는 도구 생성
             var serializer = new DataContractJsonSerializer(typeof(List<FeeRecord>));
-
-            // 파일을 생성 모드로 열고 쓰기
+            // FileMode.Create: 파일이 있으면 덮어쓰고, 없으면 새로 만듭니다.
             using (var stream = new FileStream(_filePath, FileMode.Create))
             {
                 serializer.WriteObject(stream, records);
             }
         }
 
-        // 데이터 불러오기 (역직렬화)
+        /// <summary>
+        /// JSON 파일로부터 저장된 관리비 내역을 불러옵니다.
+        /// </summary>
         public List<FeeRecord> Load()
         {
             if (!File.Exists(_filePath)) return new List<FeeRecord>();
 
             var serializer = new DataContractJsonSerializer(typeof(List<FeeRecord>));
-
+            // FileMode.Open: 기존 파일을 엽니다.
             using (var stream = new FileStream(_filePath, FileMode.Open))
             {
-                // 읽어온 데이터를 List<FeeRecord>로 형변환
                 var result = serializer.ReadObject(stream) as List<FeeRecord>;
                 return result ?? new List<FeeRecord>();
             }
         }
-        // 항목 정의 파일 경로
-        private string _itemsFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "items.json");
 
-        // 1. 항목 리스트 저장
+        #endregion
+
+        #region [항목 리스트 저장/로드]
+
+        /// <summary>
+        /// 사용자가 설정한 항목 이름 리스트(콤보박스용 등)를 저장합니다.
+        /// </summary>
         public void SaveItems(List<string> items)
         {
             var serializer = new DataContractJsonSerializer(typeof(List<string>));
@@ -57,12 +71,14 @@ namespace ManagementHouseFee.Services
             }
         }
 
-        // 2. 항목 리스트 불러오기 (파일 없으면 기본값 반환)
+        /// <summary>
+        /// 저장된 항목 리스트를 불러옵니다. 파일이 없으면 초기 기본값을 반환합니다.
+        /// </summary>
         public List<string> LoadItems()
         {
             if (!File.Exists(_itemsFilePath))
             {
-                // 파일이 없으면 기본 항목 리스트 반환
+                // 파일이 없으면 기본 제공 카테고리 반환
                 return new List<string> { "전기세", "수도세", "가스세", "관리비", "인터넷" };
             }
 
@@ -73,5 +89,7 @@ namespace ManagementHouseFee.Services
                 return result ?? new List<string>();
             }
         }
+
+        #endregion
     }
 }

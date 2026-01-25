@@ -7,21 +7,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+
     <ApplicationIcon>app_icon.ico</ApplicationIcon>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="AssemblyInfo.cs" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsPublishable>True</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsPublishable>True</IsPublishable>
+  </PropertyGroup>
 
   <ItemGroup>
     <Resource Include="app_icon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

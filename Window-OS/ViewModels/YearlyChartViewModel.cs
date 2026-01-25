@@ -39,10 +39,10 @@ namespace ManagementHouseFee.ViewModels
             foreach (var year in years)
             {
                 var recordsInYear = _allRecords.Where(r => r.Year == year).ToList();
-                
+
                 // 해당 연도의 월 평균 총액 계산
                 double avgTotal = recordsInYear.Any() ? recordsInYear.Average(r => r.TotalAmount) : 0;
-                
+
                 // \n을 사용하여 연도 밑에 금액이 나오도록 구성
                 labelsWithTotals.Add($"{year}년\n({avgTotal:N0}원)");
             }
@@ -50,9 +50,9 @@ namespace ManagementHouseFee.ViewModels
 
             // 3. 모든 항목 이름 찾기
             var allItemNames = _allRecords.SelectMany(r => r.Items)
-                                        .Select(i => i.Name)
-                                        .Distinct()
-                                        .ToList();
+                                          .Select(i => i.Name)
+                                          .Distinct()
+                                          .ToList();
 
             var seriesCollection = new SeriesCollection();
 
@@ -67,8 +67,8 @@ namespace ManagementHouseFee.ViewModels
                     if (recordsInYear.Any())
                     {
                         double sum = recordsInYear.SelectMany(r => r.Items)
-                                                .Where(i => i.Name == itemName)
-                                                .Sum(i => i.Amount);
+                                                  .Where(i => i.Name == itemName)
+                                                  .Sum(i => i.Amount);
                         double avg = sum / recordsInYear.Count;
                         values.Add(avg);
                     }
@@ -83,7 +83,6 @@ namespace ManagementHouseFee.ViewModels
                     Title = itemName,
                     Values = values,
                     DataLabels = false,
-                    LabelPoint = point => $"{point.Y:N0}원 ({point.Participation:P1})"
                 });
             }
 

@@ -55,7 +55,7 @@ namespace ManagementHouseFee.ViewModels
             {
                 var record = targetRecords.FirstOrDefault(r => r.Month == m);
                 double monthTotal = record?.TotalAmount ?? 0;
-                
+
                 // 해당 월 밑에 총액 표시
                 labelsWithTotals.Add($"{m}월\n({monthTotal:N0}원)");
             }
@@ -63,9 +63,9 @@ namespace ManagementHouseFee.ViewModels
 
             // 3. 모든 항목 이름 찾기
             var allItemNames = _allRecords.SelectMany(r => r.Items)
-                                        .Select(i => i.Name)
-                                        .Distinct()
-                                        .ToList();
+                                          .Select(i => i.Name)
+                                          .Distinct()
+                                          .ToList();
 
             var seriesCollection = new SeriesCollection();
 
@@ -92,7 +92,7 @@ namespace ManagementHouseFee.ViewModels
                 {
                     Title = itemName,
                     Values = values,
-                    DataLabels = false
+                    DataLabels = false,
                 });
             }
 
